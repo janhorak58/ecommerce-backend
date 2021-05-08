@@ -58,24 +58,50 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 
-@api_view(["POST"])
+@api_view(['POST'])
 def registerUser(request):
-    data = request.data 
-    try: 
-        name = data["name"].split(" ")
+    data = request.data
+    fullname = data['name'].split(" ")
+    try:
         user = User.objects.create(
-            first_name = name[0],
-            last_name = name[1],
-            username = data["email"],
-            email = data["email"],
-            password = make_password(data["password"]),
-
+            first_name=fullname[0],
+            last_name=fullname[1],
+            username=data['email'],
+            email=data['email'],
+            password=make_password(data['password'])
         )
-        serializer = UserSerializerWithToken(user, many= False)
+
+        serializer = UserSerializerWithToken(user, many=False)
         return Response(serializer.data)
     except:
-        message = {"detail":"User with this email already exists"}
-        return Response(message, status = status.HTTP_400_BAD_REQUEST)
+        message = {'detail': 'User with this email already exists'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def updateUserProfile(request):
+    user = request.user 
+    serializer = UserSerializerWithToken(user, many=False)
+    data = request.data
+    if data["name"] != "":
+        fullname = data['name'].split(" ")
+        if len(fullname) == 1:
+            user.first_name = fullname[0]
+
+        if len(fullname) == 2:
+            user.first_name = fullname[0]
+            user.last_name = fullname[1]
+            
+    if data["email"] != "":
+        user.username = data["email"]
+        user.email = data["email"]
+
+    if (data)['password'] != '':
+        user.password = make_password(str(data["password"]))
+    
+    user.save()
+
+    return Response(serializer.data)
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
