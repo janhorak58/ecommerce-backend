@@ -43,7 +43,7 @@ class Order(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
 
     def __str__(self):
-        return str(self.user.last_name  + "\'s order number: " + self.id + "made at: " + self.createdAt)
+        return str(self.user.last_name  + "\'s order number: " + str(self._id) + " made at: " + str(self.createdAt))
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)

@@ -182,4 +182,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+#APPEND_SLASH=False 
 
+TIME_ZONE = "CET"
+USE_TZ = True
