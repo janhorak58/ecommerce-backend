@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-l=#%n(6k!tns_lb4ujutjb1a6&*f_0-r52qvkbl3+%rjye+2*r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["proshop-janhorak.herokuapp.com", "127.0.0.1", "localhost"]
 
 
 # Application definition
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'corsheaders',
+
+    "storages",
     'base.apps.BaseConfig',
 
 ]
@@ -84,6 +87,8 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+      'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
@@ -102,7 +107,9 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'frontend/build')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,8 +130,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'proshop',
+        "USER":"janhorak",
+        "PASSWORD": os.environ.get("DB_PASS"),
+        "HOST":"proshop-identifier.cktukhyyw1mu.us-east-2.rds.amazonaws.com",
+        "PORT":"5432",
+
     }
 }
 
@@ -168,10 +182,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = "/images/"
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "static",
+    BASE_DIR / "frontend/build/static",
 ]
 
-MEDIA_ROOT = "static/images"
+MEDIA_ROOT = BASE_DIR / "static/images"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -186,3 +202,14 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 TIME_ZONE = "CET"
 USE_TZ = True
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = "AKIAQA5MJBYGNXJZJUYO"
+AWS_SECRET_ACCESS_KEY =os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = "proshop-bucket-janhorak"
+AWS_QUERYSTRING_AUTH = False
+
+
+if os.getcwd() == "/app":
+    DEBUG = False
