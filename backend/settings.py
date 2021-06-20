@@ -213,3 +213,4 @@ AWS_QUERYSTRING_AUTH = False
 
 if os.getcwd() == "/app":
     DEBUG = False
+    # Debug
